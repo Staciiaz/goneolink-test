@@ -10,9 +10,8 @@ VALUE_MAP = {
 
 
 def solve(input_string: str) -> tuple[int, list[str]]:
-    output_value = 0
-    explaination_list = []
     stack = []
+    item_list = []
     for current in input_string:
         if len(stack) > 0:
             top = stack[-1]
@@ -21,8 +20,7 @@ def solve(input_string: str) -> tuple[int, list[str]]:
             if current_value <= top_value:
                 stack.append(current)
             else:
-                output_value += current_value - top_value
-                explaination_list.append(f"{top}{current} = {current_value - top_value}")
+                item_list.append((f"{top}{current}", current_value - top_value))
                 stack.pop()
         else:
             stack.append(current)
@@ -32,9 +30,10 @@ def solve(input_string: str) -> tuple[int, list[str]]:
             count_map[item] += 1
         for key in count_map:
             if count_map[key] > 0:
-                output_value += count_map[key] * VALUE_MAP[key]
-                output_key = "".join([key for _ in range(count_map[key])])
-                explaination_list.insert(0, f"{output_key} = {count_map[key] * VALUE_MAP[key]}")
+                item_list.append(("".join([key for _ in range(count_map[key])]), VALUE_MAP[key] * count_map[key]))
+    item_list.sort(key=lambda x: -x[1])
+    output_value = sum(value for _, value in item_list)
+    explaination_list = [f"{item} = {value}" for item, value in item_list]
     return output_value, explaination_list
 
 
@@ -42,7 +41,7 @@ def main():
     input_list = ["AAA", "LBAAA", "RCRZCAB"]
     for i, input_string in enumerate(input_list):
         output_value, explaination_list = solve(input_string)
-        print(f"Example: {i + 1}")
+        print(f"Example {i + 1}:")
         print(f"Input: s = \"{input_string}\"")
         print(f"Output: {output_value}")
         print(f"Explanation: {', '.join(explaination_list)}")
